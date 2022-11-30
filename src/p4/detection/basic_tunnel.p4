@@ -108,7 +108,7 @@ control MyIngress(inout headers hdr,
         mark_to_drop(standard_metadata);
     }
 
-    action ipv4_forward(egressSpec_t port) {
+    action ipv4_forward(egressSpec_t port, bit<32> index) {
         standard_metadata.egress_spec = port;
         tcp_c.count(index);
     }
