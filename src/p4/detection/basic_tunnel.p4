@@ -4,7 +4,6 @@
 
 const bit<16> TYPE_MYTUNNEL = 0x1212;
 const bit<16> TYPE_IPV4 = 0x800;
-register<bit<64>>(1) tcp_c;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -13,8 +12,6 @@ register<bit<64>>(1) tcp_c;
 typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
 typedef bit<32> ip4Addr_t;
-typedef bit<64> temp;
-
 
 
 header ethernet_t {
@@ -106,6 +103,7 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 control MyIngress(inout headers hdr,
                   inout metadata meta,
                   inout standard_metadata_t standard_metadata) {
+    counter(1,CounterType.packets) tcp_c;
     action drop() {
         mark_to_drop(standard_metadata);
     }
@@ -132,8 +130,7 @@ control MyIngress(inout headers hdr,
 
     action myTunnel_forward(egressSpec_t port) {
         standard_metadata.egress_spec = port;
-        tcp_c.read(temp, 0);
-        tcp_c.write(0, temp+1);
+        tcp_c.count(0);
     }
 
     table myTunnel_exact {
