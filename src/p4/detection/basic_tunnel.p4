@@ -4,6 +4,7 @@
 
 const bit<16> TYPE_MYTUNNEL = 0x1212;
 const bit<16> TYPE_IPV4 = 0x800;
+register<bit<64>>(1) tcp_c;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -12,6 +13,9 @@ const bit<16> TYPE_IPV4 = 0x800;
 typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
 typedef bit<32> ip4Addr_t;
+typedef bit<64> temp;
+
+
 
 header ethernet_t {
     macAddr_t dstAddr;
@@ -128,6 +132,8 @@ control MyIngress(inout headers hdr,
 
     action myTunnel_forward(egressSpec_t port) {
         standard_metadata.egress_spec = port;
+        tcp_c.read(temp, 0);
+        tcp_c.write(0, temp+1);
     }
 
     table myTunnel_exact {
